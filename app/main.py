@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
@@ -10,25 +11,25 @@ from app.storage import init_db, save_validation
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("echo-hub")
 
-app = FastAPI(
-    title="E.C.H.O. Hub API",
-    description="Edge-computing orchestrator for hyperlocal flood/crop/heat alerts",
-    version="1.0.0",
-)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    logger.info("E.C.H.O. Hub started, DB initialized.")
+    yield
+    logger.info("E.C.H.O. Hub shutting down.")
+
+
+app = FastAPI(title="E.C.H.O. Hub API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],       # hackathon-scale only — tighten for real deployment
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-@app.on_event("startup")
-def startup_event() -> None:
-    init_db()
-    logger.info("E.C.H.O. Hub started, DB initialized.")
 
 
 @app.get("/health")

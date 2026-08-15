@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator,StrictBool
 from typing import Optional
 from enum import Enum
 
@@ -42,7 +42,7 @@ class AlertResponse(BaseModel):
 class ValidationRequest(BaseModel):
     """What the frontend POSTs when a field worker taps a validation button."""
     alert_id: str = Field(..., min_length=1)
-    is_valid: bool
+    is_valid: StrictBool
     user_feedback: Optional[str] = Field(default=None, max_length=300)
 
 
