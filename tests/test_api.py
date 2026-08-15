@@ -5,9 +5,15 @@ import os
 
 client = TestClient(app)
 
+
 def setup_module():
     if DB_PATH.exists():
         os.remove(DB_PATH)
+    client.__enter__()      # <-- NEW: manually triggers FastAPI's lifespan (init_db runs here)
+
+
+def teardown_module():
+    client.__exit__(None, None, None)   # <-- NEW: clean shutdown
 
 def test_health_check():
     r = client.get("/health")
@@ -49,7 +55,8 @@ def test_post_validate_missing_required_field():
 
 def test_post_validate_empty_alert_id():
     r = client.post("/validate", json={"alert_id": "", "is_valid": True})
-    assert r.status_code == 500  
+    assert r.status_code == 422   # was 500 — empty alert_id is now caught by Pydantic (min_length=1),
+                                   # which is correct: client error -> 422, not server error -> 500
 
 def test_post_validate_wrong_type():
     r = client.post("/validate", json={"alert_id": "ALT-8821", "is_valid": "yes"})
