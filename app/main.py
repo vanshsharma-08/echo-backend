@@ -5,7 +5,8 @@ from typing import List
 import logging
 
 from app.models import ValidationRequest, ValidationResponse, AlertResponse
-from app.mock_ml import get_mock_alerts as get_alerts_source
+# from app.mock_ml import get_mock_alerts as get_alerts_source
+from app.ml_source import get_alerts_source
 from app.storage import init_db, save_validation
 
 logging.basicConfig(level=logging.INFO)

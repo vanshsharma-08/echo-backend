@@ -6,3 +6,9 @@ venv/
 .DS_Store
 Thumbs.db
 desktop.ini
+.env
+ml_engine/.env
+ml_engine/.cache.sqlite
+
+# ML runtime cache
+ml_engine/.cache.sqlite
